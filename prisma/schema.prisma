@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model pedidos {
+  id             Int              @id(map: "pedidos_pk") @default(autoincrement())
+  nome           String
+  endereco       String
+  total          Int
+  createdAt      DateTime         @default(now())
+  pedidos_pratos pedidos_pratos[]
+}
+
+model pedidos_pratos {
+  id         Int     @id(map: "pedidos_pratos_pk") @default(autoincrement())
+  id_pratos  Int
+  id_pedidos Int
+  pratos     pratos  @relation(fields: [id_pratos], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pedidos_pratos_fk0")
+  pedidos    pedidos @relation(fields: [id_pedidos], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pedidos_pratos_fk1")
+}
+
+model pratos {
+  id             Int              @id(map: "pratos_pk") @default(autoincrement())
+  nome           String           @unique
+  desc           String
+  preco          Int
+  id_tipo_prato  Int
+  tipo_prato     tipo_prato       @relation(fields: [id_tipo_prato], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pratos_fk0")
+  pedidos_pratos pedidos_pratos[]
+
+  @@map("Pratos")
+}
+
+model tipo_prato {
+  id     Int      @id(map: "tipo_prato_pk") @default(autoincrement())
+  nome   String   @unique
+  pratos pratos[]
+}
